@@ -23,8 +23,30 @@ namespace MediaDeviceApp.ViewModel
 
         public StillImageViewModel()
         {
-            this.stillImageSource = new BitmapImage(new Uri("pack://application:,,,/Folder.png"));
+            try
+            {
+                string basePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                this.stillImageSource = LoadBitmapImage(System.IO.Path.Combine(basePath, "Images", "Folder.png"));
+            }
+            catch
+            {
+                this.stillImageSource = new BitmapImage();
+            }
             this.StillImageCommand = new DelegateCommand(OnStillImageCapture);
+        }
+
+        private BitmapImage LoadBitmapImage(string path)
+        {
+            if (!System.IO.File.Exists(path))
+                return new BitmapImage();
+
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path, UriKind.Absolute);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
         }
 
         public void Update(MediaDevice device)

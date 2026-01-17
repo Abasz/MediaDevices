@@ -44,8 +44,32 @@ namespace MediaDeviceApp.ViewModel
 
             static Info()
             {
-                fileImage = new BitmapImage(new Uri("pack://application:,,,/File.png"));
-                folderImages = new BitmapImage(new Uri("pack://application:,,,/Folder.png"));
+                try
+                {
+                    string basePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    fileImage = LoadBitmapImage(System.IO.Path.Combine(basePath, "Images", "File.png"));
+                    folderImages = LoadBitmapImage(System.IO.Path.Combine(basePath, "Images", "Folder.png"));
+                }
+                catch
+                {
+                    // Fallback if images not found
+                    fileImage = new BitmapImage();
+                    folderImages = new BitmapImage();
+                }
+            }
+
+            private static BitmapImage LoadBitmapImage(string path)
+            {
+                if (!System.IO.File.Exists(path))
+                    return new BitmapImage();
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(path, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
             }
 
             public Info(string fullName)

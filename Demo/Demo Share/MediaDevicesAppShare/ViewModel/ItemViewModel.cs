@@ -21,8 +21,32 @@ namespace MediaDeviceApp.ViewModel
 
         static ItemViewModel()
         {
-            imgFolder = new BitmapImage(new Uri("pack://application:,,,/Folder.png"));
-            imgFile = new BitmapImage(new Uri("pack://application:,,,/File.png"));
+            try
+            {
+                string basePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                imgFolder = LoadBitmapImage(System.IO.Path.Combine(basePath, "Images", "Folder.png"));
+                imgFile = LoadBitmapImage(System.IO.Path.Combine(basePath, "Images", "File.png"));
+            }
+            catch
+            {
+                // Fallback if images not found
+                imgFolder = new BitmapImage();
+                imgFile = new BitmapImage();
+            }
+        }
+
+        private static BitmapImage LoadBitmapImage(string path)
+        {
+            if (!System.IO.File.Exists(path))
+                return new BitmapImage();
+
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path, UriKind.Absolute);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
         }
 
         public ItemViewModel(MediaFileSystemInfo item)
