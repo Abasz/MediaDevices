@@ -5,34 +5,35 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    name: Build Demo App
+    runs-on: windows-2022
+    environment: sign
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v6
       
-    - name: Setup .NET 8
-      uses: actions/setup-dotnet@v4
+    - name: Setup DotNet
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '8.0.x'
+    
+    - name: Add SignKeys
+      uses: Bassman2/SignKey@v1
+      with:
+        file: Bassman.snk
+        key: ${{ secrets.SIGNKEY }}
         
     - name: Restore dependencies
       run: dotnet restore "Demo/Demo .NET 8.0/MediaDevicesApp80/MediaDevicesApp80.csproj"
       
-    - name: Publish as single file executable
+    - name: Publish (self-contained folder)
       run: |
-        dotnet publish "Demo/Demo .NET 8.0/MediaDevicesApp80/MediaDevicesApp80.csproj" `
-          -c Release `
-          -r win-x64 `
-          --self-contained true `
-          -p:PublishSingleFile=true `
-          -p:IncludeNativeLibrariesForSelfExtract=true `
-          -p:EnableCompressionInSingleFile=true `
-          -o "./publish"
-          
-    - name: Upload artifact
+        dotnet publish "Demo/Demo .NET 8.0/MediaDevicesApp80/MediaDevicesApp80.csproj" -c Release -r win-x64 --self-contained true -o "./publish"
+    
+    - name: Upload artifact (full publish folder)
       uses: actions/upload-artifact@v4
       with:
         name: MediaDevicesApp-NET8-win-x64
-        path: ./publish/MediaDevicesApp.exe
+        path: ./publish
         retention-days: 30

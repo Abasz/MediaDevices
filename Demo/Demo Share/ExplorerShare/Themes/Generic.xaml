@@ -18,7 +18,7 @@
                             <ColumnDefinition Width="6"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TreeView x:Name="treeView" Grid.Column="0" ItemsSource="{TemplateBinding InternalItemsSource}">
+                        <TreeView x:Name="treeView" Grid.Column="0" ItemsSource="{Binding InternalItemsSource, RelativeSource={RelativeSource TemplatedParent}}">
                             <TreeView.ItemContainerStyle>
                                 <Style TargetType="{x:Type TreeViewItem}">
                                     <Setter Property="IsSelected" Value="{Binding IsSelectedInTree}" />
@@ -40,7 +40,7 @@
                         <DataGrid 
                                 Grid.Column="2"
                                 x:Name="dataGrid"
-                                ItemsSource="{TemplateBinding ListItems}" 
+                                ItemsSource="{Binding ListItems, RelativeSource={RelativeSource TemplatedParent}}" 
                                 HeadersVisibility="Column" 
                                 AutoGenerateColumns="False" 
                                 GridLinesVisibility="None" 
