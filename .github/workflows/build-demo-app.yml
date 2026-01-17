@@ -1,0 +1,38 @@
+name: Build .NET 8 Demo App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore "Demo/Demo .NET 8.0/MediaDevicesApp80/MediaDevicesApp80.csproj"
+      
+    - name: Publish as single file executable
+      run: |
+        dotnet publish "Demo/Demo .NET 8.0/MediaDevicesApp80/MediaDevicesApp80.csproj" `
+          -c Release `
+          -r win-x64 `
+          --self-contained true `
+          -p:PublishSingleFile=true `
+          -p:IncludeNativeLibrariesForSelfExtract=true `
+          -p:EnableCompressionInSingleFile=true `
+          -o "./publish"
+          
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MediaDevicesApp-NET8-win-x64
+        path: ./publish/MediaDevicesApp.exe
+        retention-days: 30
